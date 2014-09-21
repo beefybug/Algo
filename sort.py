@@ -1,4 +1,4 @@
-__all__ = ['insertSort', 'quickSort']
+__all__ = ['insertSort', 'quickSort', 'mergeSort']
 # when using from sort import *, only those in __all__ can be seen
 
 
@@ -85,3 +85,4 @@ if __name__ == "__main__":
     a = [5, 12, 4, 1, 2, 12]
     mergeSort(a)
     print(a)
+    print("hello")
