@@ -44,6 +44,7 @@ def partition(data, i, j):
 
 
 def mergeSort(data):
+    """Wraper for mergeSorter"""
     mergeSorter(data, 0, len(data)-1)
     pass
 
