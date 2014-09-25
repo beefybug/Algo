@@ -9,6 +9,9 @@ res = []
 
 num = 1000
 
+
+# hello
+
 for i in range(num):
     random.shuffle(data)
     res.append(copy.copy(data))

@@ -7,105 +7,124 @@ def enum(*sequential, **named):
     return type('Enum', (), enums)
 
 
-graph_type = enum("Directed", "Undirected")
-store_type = enum("Adj_Matrix", "Adj_List")
+# graph_type = enum("Directed", "Undirected")
+# store_type = enum("Adj_Matrix", "Adj_List")
 
 # TODO create data structure to represent search trees.
 
 
 class graph:
 
-    def __init__(self, num_V=None, E=None, gt=None, st=store_type.Adj_List):
+    def __init__(self, num_V, E):
         self.numV = num_V
         self.numE = len(E)
-        self.graph = gt
-        self.store = st
-        self.initEV(num_V, E, st)
+        self.initEV(num_V, E)
 
-    def initEV(self, num_V, E, st):
+    def initEV(self, num_V, E):
         """E should be passed as a tuple of tuple with the assumption that
         the directon is u -> v for (u, v). Does not matter for undirected.
-        E should be unique as well.
+        All entries in E should be unique.
         """
 
-        if st == store_type.Adj_List:
-            self.outData = [[] for i in range(num_V)]
-            self.inData = [[] for i in range(num_V)]
-            for pair in E:
-                self.outData[pair[0]].append(pair[1])
-                self.inData[pair[1]].append(pair[0])
+        self.outData = [[] for i in range(num_V)]
+        self.inData = [[] for i in range(num_V)]
+        for pair in E:
+            self.outData[pair[0]].append(pair[1])
+            self.inData[pair[1]].append(pair[0])
+
+        for i in self.outData:
+            i.sort()
+
+        for j in self.inData:
+            j.sort()
 
 
-def BFS(g, start):
-    """Breath First Search of a graph starting from vertex start"""
-    size_of_V = g.numV
-    if start < 0 or start >= size_of_V:
-        raise ValueError("The starting vertex is out of range.")
-    # Initialization of counters
-    discovered = [0 for i in range(size_of_V)]
-    discovered[start] = 1
-    distance = [0 for i in range(size_of_V)]
-    parent = [None for i in range(size_of_V)]
-    parent[start] = -1
+class BFS:
 
-    # Uses built-in queue definitio
-    queue = deque([start])
-    while len(queue) > 0:
-        u = queue.popleft()
-        for v in g.outData[u]:
-            # v refers to neighbours of u
-            if discovered[v] == 0:
-                discovered[v] = 1
-                queue.append(v)
-                distance[v] = distance[u] + 1
-                parent[v] = u
+    def __init__(self, g):
+        self.graph = g
+        self.discovered = [0 for i in range(g.numV)]
+        self.distance = [0 for i in range(g.numV)]
+        self.parent = [0 for i in range(g.numV)]
 
-    print("Parents :", parent)
-    print("Distance:", distance)
+    def run(self, start):
+        if start < 0 or start >= self.graph.numV:
+            raise ValueError("The starting vertex is out of range.")
+        self.startingVertex = start
+        self.parent[start] = 's'
+        self.discovered[start] = 1
+        queue = deque([start])
 
+        while len(queue) > 0:
+            u = queue.popleft()
+            for v in self.graph.outData[u]:
+                # v refers to neighbours of u
+                if self.discovered[v] == 0:
+                    self.discovered[v] = 1
+                    queue.append(v)
+                    self.distance[v] = self.distance[u] + 1
+                    self.parent[v] = u
 
-def DFS(g, start):
-    """Depth First Search of a graph starting from vertex start"""
-    size_of_V = g.numV
-    if start < 0 or start >= size_of_V:
-        raise ValueError("The starting vertex is out of range.")
-
-    discovered = [0 for i in range(size_of_V)]
-    discovered[start] = 1
-    distance = [0 for i in range(size_of_V)]
-    parent = [0 for i in range(size_of_V)]
-    parent[start] = None
-    # TODO need to complete the DFS algorithm
+    def __str__(self):
+        line = "Parent  :{}\n".format(self.parent)
+        line += "Distance:{}".format(self.distance)
+        return line
 
 
-def search(g, vertex):
-    # TODO write the recursive search function
-    pass
+class DFS:
 
+    def __init__(self, g):
+        self.cnt = 1
+        self.graph = g
+        self.discovered = [0 for i in range(g.numV)]
+        self.start = [0 for i in range(g.numV)]
+        self.finish = [0 for i in range(g.numV)]
 
-def printAtt(obj):
-    for i in dir(obj):
-        if i[0] != '_':
-            print(i, getattr(obj, i))
+    def run(self):
+        for u in range(self.graph.numV):
+            if self.discovered[u] == 0:
+                self.search(u)
+
+    def search(self, u):
+        self.previsit(u)
+        self.discovered[u] = 1
+        for v in self.graph.outData[u]:
+            if self.discovered[v] == 0:
+                self.search(v)
+        self.postvisit(u)
+
+    def previsit(self, u):
+        self.start[u] = self.cnt
+        self.cnt += 1
+
+    def postvisit(self, u):
+        self.finish[u] = self.cnt
+        self.cnt += 1
+
+    def __str__(self):
+        line = "Start time :{}\n".format(self.start)
+        line += "Finish time:{}".format(self.finish)
+        return line
 
 
 def test():
-    E = ((0, 2),
-         (0, 4),
-         (0, 5),
-         (1, 0),
-         (2, 1),
-         (2, 5),
-         (3, 1),
-         (3, 6),
-         (4, 0),
+    E = ((0, 1),
+         (1, 2),
+         (2, 0),
+         (0, 3),
+         (4, 3),
          (4, 5),
-         (6, 3),
-         (6, 5))
+         (5, 6),
+         (6, 4))
     num_V = 7
-    a = graph(num_V, E, graph_type.Directed, store_type.Adj_List)
-    print(a.inData)
-    print(a.outData)
-    BFS(a, 6)
+    g = graph(num_V, E)
+    print(g.inData)
+    print(g.outData)
+    b = BFS(g)
+    b.run(6)
+    print(b)
+    d = DFS(g)
+    d.run()
+    print(d)
 
 test()
