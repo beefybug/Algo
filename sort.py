@@ -82,8 +82,12 @@ def mergeSorter(data, i, j):
         data[i:j+1] = merge(data[i:(middle+1)], data[(middle+1):(j+1)])
         return
 
-if __name__ == "__main__":
+
+def main():
     a = [5, 12, 4, 1, 2, 12]
     mergeSort(a)
     print(a)
     print("hello")
+
+if __name__ == "__main__":
+    main()

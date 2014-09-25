@@ -1,3 +1,6 @@
+import sys
+
+
 def Mul(m, n):
     """Multiplies 2x2 matrices. Assumes m and n are array of size 4.
     [0, 1   becomes [ 0, 1, 2, 3]
@@ -35,5 +38,5 @@ def fib(n):
     return R[0]
 
 
-for i in range(50):
+for i in range(int(sys.argv[1])):
     print(fib(i))
