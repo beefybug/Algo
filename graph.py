@@ -2,15 +2,6 @@ from collections import deque
 from copy import copy
 
 
-# Trick for creating enums in python
-def enum(*sequential, **named):
-    enums = dict(zip(sequential, range(len(sequential))), **named)
-    return type('Enum', (), enums)
-
-
-# graph_type = enum("Directed", "Undirected")
-# store_type = enum("Adj_Matrix", "Adj_List")
-
 # TODO create data structure to represent search trees.
 
 
@@ -23,15 +14,15 @@ class graph:
 
     def initEV(self, num_V, E):
         """E should be passed as a tuple of tuple with the assumption that
-        the directon is u -> v for (u, v). Does not matter for undirected.
-        All entries in E should be unique.
+        the directon is u -> v for (u, v). All entries in E should be unique.
         """
 
         self.outData = [[] for i in range(num_V)]
         self.inData = [[] for i in range(num_V)]
+        # Vertex is 1-indexed but storage is 0-indexed
         for pair in E:
-            self.outData[pair[0]].append(pair[1])
-            self.inData[pair[1]].append(pair[0])
+            self.outData[pair[0]-1].append(pair[1]-1)
+            self.inData[pair[1]-1].append(pair[0]-1)
 
         for i in self.outData:
             i.sort()
@@ -49,22 +40,22 @@ class BFS:
         self.parent = [0 for i in range(g.numV)]
 
     def run(self, start):
-        if start < 0 or start >= self.graph.numV:
+        if start < 0 or start > self.graph.numV:
             raise ValueError("The starting vertex is out of range.")
         self.startingVertex = start
-        self.parent[start] = 's'
-        self.discovered[start] = 1
-        queue = deque([start])
+        self.parent[start-1] = 's'
+        self.discovered[start-1] = 1
+        queue = deque([start-1])
 
         while len(queue) > 0:
             u = queue.popleft()
             for v in self.graph.outData[u]:
-                # v refers to neighbours of u
+                # v refers to neighbours of u and accounted for 0-indexed
                 if self.discovered[v] == 0:
                     self.discovered[v] = 1
                     queue.append(v)
                     self.distance[v] = self.distance[u] + 1
-                    self.parent[v] = u
+                    self.parent[v] = u + 1
 
     def __str__(self):
         line = "Parent  :{}\n".format(self.parent)
@@ -112,6 +103,8 @@ class DFS:
 
         self.group = []
         self.temp = copy(self.finish)
+        # After exploring a node, the finish time for it is set to 0,
+        # so that the following trick can be used.
         while sum(self.temp) > 0:
             self.group.append([])
             u = self.temp.index(max(self.temp))
@@ -121,7 +114,7 @@ class DFS:
             group.sort()
 
     def searchSCC(self, u):
-        self.group[-1].append(u)
+        self.group[-1].append(u + 1)
         self.discovered[u] = 0
         self.temp[u] = 0
         for v in self.graph.inData[u]:
@@ -136,20 +129,20 @@ class DFS:
 
 
 def _test():
-    E = ((0, 1),
-         (1, 2),
-         (2, 0),
-         (0, 3),
-         (4, 3),
-         (4, 5),
+    E = ((1, 2),
+         (2, 3),
+         (3, 1),
+         (1, 3),
+         (5, 4),
          (5, 6),
-         (6, 4))
+         (6, 7),
+         (7, 5))
     num_V = 7
     g = graph(num_V, E)
     print(g.inData)
     print(g.outData)
     b = BFS(g)
-    b.run(6)
+    b.run(7)
     print(b)
     d = DFS(g)
     print(d)
