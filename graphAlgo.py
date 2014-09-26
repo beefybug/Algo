@@ -1,4 +1,5 @@
 from collections import deque
+from copy import copy
 
 
 # Trick for creating enums in python
@@ -76,11 +77,15 @@ class DFS:
     def __init__(self, g):
         self.cnt = 1
         self.graph = g
-        self.discovered = [0 for i in range(g.numV)]
-        self.start = [0 for i in range(g.numV)]
-        self.finish = [0 for i in range(g.numV)]
+        self.discovered = None
+        self.start = None
+        self.finish = None
+        self.group = None
 
     def run(self):
+        self.discovered = [0 for i in range(self.graph.numV)]
+        self.start = [0 for i in range(self.graph.numV)]
+        self.finish = [0 for i in range(self.graph.numV)]
         for u in range(self.graph.numV):
             if self.discovered[u] == 0:
                 self.search(u)
@@ -101,13 +106,36 @@ class DFS:
         self.finish[u] = self.cnt
         self.cnt += 1
 
+    def SCC(self):
+        if self.start is None:
+            self.run()  # Ensure that finish time is available
+
+        self.group = []
+        self.temp = copy(self.finish)
+        while sum(self.temp) > 0:
+            self.group.append([])
+            u = self.temp.index(max(self.temp))
+            self.searchSCC(u)
+
+        for group in self.group:
+            group.sort()
+
+    def searchSCC(self, u):
+        self.group[-1].append(u)
+        self.discovered[u] = 0
+        self.temp[u] = 0
+        for v in self.graph.inData[u]:
+            if self.discovered[v] == 1:
+                self.searchSCC(v)
+
     def __str__(self):
         line = "Start time :{}\n".format(self.start)
-        line += "Finish time:{}".format(self.finish)
+        line += "Finish time:{}\n".format(self.finish)
+        line += "Groups are :{}".format(self.group)
         return line
 
 
-def test():
+def _test():
     E = ((0, 1),
          (1, 2),
          (2, 0),
@@ -124,7 +152,10 @@ def test():
     b.run(6)
     print(b)
     d = DFS(g)
+    print(d)
     d.run()
+    d.SCC()
     print(d)
 
-test()
+if __name__ == "__main__":
+    _test()
