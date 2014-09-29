@@ -20,9 +20,13 @@ class graph:
         self.outData = [[] for i in range(num_V)]
         self.inData = [[] for i in range(num_V)]
         # Vertex is 1-indexed but storage is 0-indexed
-        for pair in E:
-            self.outData[pair[0]-1].append(pair[1]-1)
-            self.inData[pair[1]-1].append(pair[0]-1)
+        try:
+            for pair in E:
+                self.outData[pair[0]-1].append(pair[1]-1)
+                self.inData[pair[1]-1].append(pair[0]-1)
+        except IndexError as e:
+            print("Issue at pair {}".format(pair))
+            raise e
 
         for i in self.outData:
             i.sort()
@@ -66,14 +70,14 @@ class BFS:
 class DFS:
 
     def __init__(self, g):
-        self.cnt = 1
         self.graph = g
         self.discovered = None
         self.start = None
         self.finish = None
-        self.group = None
+        self.groups = None
 
     def run(self):
+        self.cnt = 1
         self.discovered = [0 for i in range(self.graph.numV)]
         self.start = [0 for i in range(self.graph.numV)]
         self.finish = [0 for i in range(self.graph.numV)]
@@ -101,54 +105,63 @@ class DFS:
         if self.start is None:
             self.run()  # Ensure that finish time is available
 
-        self.group = []
+        self.groups = []
         self.temp = copy(self.finish)
         # After exploring a node, the finish time for it is set to 0,
         # so that the following trick can be used.
         while sum(self.temp) > 0:
-            self.group.append([])
+            self.groups.append([])
             u = self.temp.index(max(self.temp))
             self.searchSCC(u)
 
-        for group in self.group:
+        for group in self.groups:
             group.sort()
 
+        self.groups.sort()
+
     def searchSCC(self, u):
-        self.group[-1].append(u + 1)
+        self.groups[-1].append(u + 1)
         self.discovered[u] = 0
         self.temp[u] = 0
         for v in self.graph.inData[u]:
             if self.discovered[v] == 1:
                 self.searchSCC(v)
 
+    def printGroups(self):
+        for idx, g in enumerate(self.groups):
+            print(len(g), g)
+            if idx > 0 and self.groups[idx][0] < self.groups[idx-1][0]:
+                raise ArithmeticError
+
     def __str__(self):
         line = "Start time :{}\n".format(self.start)
-        line += "Finish time:{}\n".format(self.finish)
-        line += "Groups are :{}".format(self.group)
+        line += "Finish time:{}".format(self.finish)
         return line
 
 
 def _test():
     E = ((1, 2),
          (2, 3),
-         (3, 1),
-         (1, 3),
-         (5, 4),
+         (3, 4),
+         (5, 1),
+         (2, 5),
+         (2, 6),
+         (8, 4),
          (5, 6),
          (6, 7),
-         (7, 5))
-    num_V = 7
+         (4, 3),
+         (7, 6),
+         (8, 7),
+         (4, 8))
+    num_V = 8
     g = graph(num_V, E)
-    print(g.inData)
-    print(g.outData)
     b = BFS(g)
     b.run(7)
     print(b)
     d = DFS(g)
     print(d)
-    d.run()
     d.SCC()
-    print(d)
+    d.printGroups()
 
 if __name__ == "__main__":
     _test()
