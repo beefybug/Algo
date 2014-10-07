@@ -1,8 +1,6 @@
 from collections import deque
 from copy import copy
-
-
-# TODO create data structure to represent search trees.
+import networkx as nx
 
 
 class graph:
@@ -10,6 +8,8 @@ class graph:
     def __init__(self, num_V, E):
         self.numV = num_V
         self.numE = len(E)
+        self.G = nx.DiGraph()
+        self.G.add_nodes_from([i for i in range(1, num_V+1)])
         self.initEV(num_V, E)
 
     def initEV(self, num_V, E):
@@ -17,6 +17,7 @@ class graph:
         the directon is u -> v for (u, v). All entries in E should be unique.
         """
 
+        # TODO account for weight
         self.outData = [[] for i in range(num_V)]
         self.inData = [[] for i in range(num_V)]
         # Vertex is 1-indexed but storage is 0-indexed
@@ -24,15 +25,16 @@ class graph:
             for pair in E:
                 self.outData[pair[0]-1].append(pair[1]-1)
                 self.inData[pair[1]-1].append(pair[0]-1)
+                self.G.add_edge(*pair)
         except IndexError as e:
             print("Issue at pair {}".format(pair))
             raise e
 
-        for i in self.outData:
-            i.sort()
-
-        for j in self.inData:
-            j.sort()
+    def SCC(self):
+        self.groups = [sorted(i)for i in nx.strongly_connected_components(self.G)]
+        self.groups.sort()
+        for group in self.groups:
+            print(len(group), *group)
 
 
 class BFS:
@@ -108,7 +110,6 @@ class DFS:
         self.groups = []
         self.temp = copy(self.finish)
         # After exploring a node, the finish time for it is set to 0,
-        # so that the following trick can be used.
         while sum(self.temp) > 0:
             self.groups.append([])
             u = self.temp.index(max(self.temp))
@@ -129,7 +130,8 @@ class DFS:
 
     def printGroups(self):
         for idx, g in enumerate(self.groups):
-            print(len(g), g)
+            print(len(g), *g)
+            # Checking to make sure that it is sorted
             if idx > 0 and self.groups[idx][0] < self.groups[idx-1][0]:
                 raise ArithmeticError
 
@@ -155,13 +157,10 @@ def _test():
          (4, 8))
     num_V = 8
     g = graph(num_V, E)
-    b = BFS(g)
-    b.run(7)
-    print(b)
     d = DFS(g)
-    print(d)
     d.SCC()
     d.printGroups()
+    g.SCC()
 
 if __name__ == "__main__":
     _test()

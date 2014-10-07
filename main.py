@@ -1,7 +1,7 @@
 import random
 import time
 import copy
-from sort import insertSort, quickSort, mergeSort
+from sort import insertSort, quickSort, mergeSort, rquickSort
 
 data = [i for i in range(200)]
 baseData = [i for i in range(200)]
@@ -34,6 +34,15 @@ for i in range(num):
         print("Quick Sort issue")
 print("Quick sort takes on average {:5f}".format((time.clock()-start)/num))
 
+
+start = time.clock()
+for i in range(num):
+    temp = copy.copy(res[i])
+    rquickSort(temp)
+    if temp != baseData:
+        print("Random Quick Sort issue")
+print("Random Quick sort takes on average {:5f}".format(
+    (time.clock()-start)/num))
 
 start = time.clock()
 for i in range(num):
