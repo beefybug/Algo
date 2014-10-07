@@ -1,5 +1,6 @@
 import os
 import sys
+# graph might be in parent directory
 try:
     import graph
 except ImportError:
@@ -7,8 +8,8 @@ except ImportError:
     import graph
 
 
-def analyze(filename):
-    with open(filename, 'r') as f:
+def analyze(inFile, outFile):
+    with open(inFile, 'r') as f:
         data = []
         numV = int(f.readline().split(" ")[0])
         for line in f:
@@ -18,20 +19,19 @@ def analyze(filename):
     d = graph.DFS(g)
     d.SCC()
     g.SCC()
-
-    filename = filename.replace("in", "out")
-    with open(filename, 'w') as f:
+    print(d.groups == g.groups)  # Check that my solution is same as builtin
+    with open(outFile, 'w') as f:
         f.write("{}\n".format(len(d.groups)))
         for g in d.groups:
             outString = "{} {}".format(len(g), " ".join(map(str, g)))
             f.write(outString + '\n')
-            print(outString)
 
 
-# Assumes that inputs are in the "Input" folder and same directory as this py
+# Assumes that inputs are in the same folder as HW2.py
 for root, directories, files in os.walk(sys.path[0]):
     for filename in files:
-        fullpath = os.path.join(root, filename)
-        if fullpath.lower().endswith(".txt"):
-            print(fullpath)
-            analyze(fullpath)
+        if filename.lower().endswith(".txt") and \
+                filename.lower().startswith("in"):
+            inFile = os.path.join(root, filename)
+            outFile = os.path.join(root, filename.replace("in", "out"))
+            analyze(inFile, outFile)

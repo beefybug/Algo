@@ -31,10 +31,10 @@ class graph:
             raise e
 
     def SCC(self):
-        self.groups = [sorted(i)for i in nx.strongly_connected_components(self.G)]
+        # Used to compare result with those from DFS algo
+        self.groups = [sorted(i)
+                       for i in nx.strongly_connected_components(self.G)]
         self.groups.sort()
-        for group in self.groups:
-            print(len(group), *group)
 
 
 class BFS:
@@ -130,7 +130,7 @@ class DFS:
 
     def printGroups(self):
         for idx, g in enumerate(self.groups):
-            print(len(g), *g)
+            print(len(g), g)
             # Checking to make sure that it is sorted
             if idx > 0 and self.groups[idx][0] < self.groups[idx-1][0]:
                 raise ArithmeticError
