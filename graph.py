@@ -2,7 +2,6 @@ from collections import deque
 from copy import copy
 import networkx as nx
 
-
 class graph:
 
     def __init__(self, num_V, E):

@@ -90,4 +90,4 @@ def testClass():
     b.shout()
     b.shout(2)
 
-
+testClass()

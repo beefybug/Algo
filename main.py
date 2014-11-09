@@ -2,7 +2,6 @@ import random
 import time
 import copy
 from sort import insertSort, quickSort, mergeSort, rquickSort
-
 data = [i for i in range(200)]
 baseData = [i for i in range(200)]
 res = []
